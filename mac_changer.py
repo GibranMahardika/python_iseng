@@ -34,15 +34,12 @@ def ChangeMac(interface, new_mac):
 # new_mac = options.new_mac
 
 def GetCurrentMac(interface):
-    # ChangeMac(options.interface, options.new_mac)
-
-    ifconfig_result = subprocess.check_output(["ifconfig", interface])
+    ifconfig_result = subprocess.check_output(["sudo","ifconfig", interface])
     # options.interface is an argument
 
-    mac_address_search_result = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", ifconfig_result)
+    mac_address_search_result = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", str(ifconfig_result))
 
     if mac_address_search_result:
-        # print(int(mac_address_search_result.group(0)))
         return mac_address_search_result.group(0)
     else:
         print("[-] Could not read MAC address")
@@ -50,7 +47,15 @@ def GetCurrentMac(interface):
 options = GetArguments()
 
 current_mac = GetCurrentMac(options.interface)
-print("Current MAC = ", current_mac)
+print("Current MAC = " + str(current_mac))
+
+ChangeMac(options.interface, options.new_mac)
+
+current_mac = GetCurrentMac(options.interface)
+if current_mac == options.new_mac:
+    print("[+] MAC address was successfully change to " + current_mac)
+else:
+    print("[-] MAC address did not get changed.")
 # how to run the code
 # python3 mac_changer.py --interface wlan0 --mac 00:00:00:00:00:11, or
 # python3 mac_changer.py -i wlan0 -m 00:00:00:00:00:11
